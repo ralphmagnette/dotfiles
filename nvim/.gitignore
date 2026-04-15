@@ -1,0 +1,25 @@
+# Logs
+*.log
+
+# Neovim
+*.swp
+*.swo
+*.swn
+*.bak
+Session.vim
+.netrwhist
+
+# Lazy.nvim
+lazy-lock.json
+
+# LazyVim state
+lazyvim.json
+
+# Repro / debug
+.repro
+debug
+doc/tags
+
+# OS
+.DS_Store
+Thumbs.db
