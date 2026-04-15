@@ -24,6 +24,28 @@ echo "📦 Installing core tools..."
 brew install git stow
 
 # --------------------------------------
+# 2b. Install Java (if missing)
+# --------------------------------------
+if ! command -v java >/dev/null 2>&1; then
+  echo "☕ Installing Java..."
+  brew install openjdk
+
+  # Ensure JAVA_HOME is set in .zprofile (only once)
+  if ! grep -q "JAVA_HOME" ~/.zprofile 2>/dev/null; then
+    echo '' >>~/.zprofile
+    echo '# Java' >>~/.zprofile
+    echo 'export JAVA_HOME=$(/usr/libexec/java_home)' >>~/.zprofile
+    echo 'export PATH="$JAVA_HOME/bin:$PATH"' >>~/.zprofile
+  fi
+
+  # Load for current session
+  export JAVA_HOME=$(/usr/libexec/java_home)
+  export PATH="$JAVA_HOME/bin:$PATH"
+else
+  echo "✅ Java already installed"
+fi
+
+# --------------------------------------
 # 3. Ensure Git is configured
 # --------------------------------------
 if ! git config --global user.name >/dev/null; then
