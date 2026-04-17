@@ -30,6 +30,11 @@ if ! command -v java >/dev/null 2>&1; then
   echo "☕ Installing Java..."
   brew install openjdk
 
+  # Make Java visible to macOS
+  sudo mkdir -p /Library/Java/JavaVirtualMachines
+  sudo ln -sfn /opt/homebrew/opt/openjdk/libexec/openjdk.jdk \
+    /Library/Java/JavaVirtualMachines/openjdk.jdk
+
   # Ensure JAVA_HOME is set in .zprofile (only once)
   if ! grep -q "JAVA_HOME" ~/.zprofile 2>/dev/null; then
     echo '' >>~/.zprofile
