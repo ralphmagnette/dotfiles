@@ -26,28 +26,50 @@ brew install git stow
 # --------------------------------------
 # 2b. Install Java (if missing)
 # --------------------------------------
-if ! command -v java >/dev/null 2>&1; then
-  echo "☕ Installing Java..."
-  brew install openjdk
+if ! /usr/libexec/java_home >/dev/null 2>&1; then
+  echo "☕ Java runtime not detected. Installing OpenJDK..."
 
-  # Make Java visible to macOS
-  sudo mkdir -p /Library/Java/JavaVirtualMachines
-  sudo ln -sfn /opt/homebrew/opt/openjdk/libexec/openjdk.jdk \
-    /Library/Java/JavaVirtualMachines/openjdk.jdk
-
-  # Ensure JAVA_HOME is set in .zprofile (only once)
-  if ! grep -q "JAVA_HOME" ~/.zprofile 2>/dev/null; then
-    echo '' >>~/.zprofile
-    echo '# Java' >>~/.zprofile
-    echo 'export JAVA_HOME=$(/usr/libexec/java_home)' >>~/.zprofile
-    echo 'export PATH="$JAVA_HOME/bin:$PATH"' >>~/.zprofile
+  if brew install openjdk; then
+    echo "   ✅ OpenJDK installed successfully"
+  else
+    echo "   ❌ Failed to install OpenJDK"
+    exit 1
   fi
 
-  # Load for current session
+  echo "🔗 Making Java visible to macOS..."
+
+  sudo mkdir -p /Library/Java/JavaVirtualMachines
+
+  if sudo ln -sfn /opt/homebrew/opt/openjdk/libexec/openjdk.jdk \
+    /Library/Java/JavaVirtualMachines/openjdk.jdk; then
+    echo "   ✅ Java symlink created successfully"
+  else
+    echo "   ❌ Failed to create Java symlink"
+    echo "   💡 Try manually:"
+    echo "      sudo ln -sfn /opt/homebrew/opt/openjdk/libexec/openjdk.jdk /Library/Java/JavaVirtualMachines/openjdk.jdk"
+    exit 1
+  fi
+
+  echo "🧭 Configuring JAVA_HOME..."
+
+  if ! grep -q "JAVA_HOME" ~/.zprofile 2>/dev/null; then
+    {
+      echo ""
+      echo "# Java"
+      echo 'export JAVA_HOME=$(/usr/libexec/java_home)'
+      echo 'export PATH="$JAVA_HOME/bin:$PATH"'
+    } >>~/.zprofile
+    echo "   ✅ Added JAVA_HOME to ~/.zprofile"
+  else
+    echo "   ℹ️ JAVA_HOME already configured in ~/.zprofile"
+  fi
+
   export JAVA_HOME=$(/usr/libexec/java_home)
   export PATH="$JAVA_HOME/bin:$PATH"
+
+  echo "   ✅ Java loaded for current session"
 else
-  echo "✅ Java already installed"
+  echo "✅ Java already installed and visible to macOS"
 fi
 
 # --------------------------------------
@@ -116,8 +138,23 @@ done
 # --------------------------------------
 # 7. Apply Stow
 # --------------------------------------
-echo "🔗 Applying dotfiles with Stow..."
-stow -t ~ nvim tmux ghostty starship zsh
+echo "🔗 Creating symlinks with Stow..."
+
+packages=(nvim tmux ghostty starship zsh)
+
+for pkg in "${packages[@]}"; do
+  echo "   → Linking $pkg..."
+
+  if stow -t ~ "$pkg"; then
+    echo "   ✅ Successfully linked $pkg"
+  else
+    echo "   ❌ Failed to link $pkg"
+    echo "   💡 Run: stow -n -v -t ~ $pkg"
+    exit 1
+  fi
+done
+
+echo "🎉 All symlinks created successfully!"
 
 # --------------------------------------
 # 8. Final message
