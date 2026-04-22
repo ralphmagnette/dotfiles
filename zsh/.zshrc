@@ -1,3 +1,6 @@
+# Make PATH and path arrays unique (idempotent shell environment)
+typeset -U path PATH
+
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
@@ -9,18 +12,18 @@ fi
 # export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH
 
 # Path to your Homebrew installation
-export PATH="/opt/homebrew/bin:$PATH"
+export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
 
 # Path to your Oh My Zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
 
 # Path to your Java installation.
-export JAVA_HOME=$(/usr/libexec/java_home -v17)
-export PATH=$JAVA_HOME/bin:$PATH
+export JAVA_HOME=$(/usr/libexec/java_home)
+export PATH="$JAVA_HOME/bin:$PATH"
 
 # Path to your Android installation.
-export ANDROID_HOME=$HOME/Library/Android/sdk
-export PATH=$ANDROID_HOME/emulator:$ANDROID_HOME/platform-tools:$PATH
+export ANDROID_HOME="$HOME/Library/Android/sdk"
+export PATH="$PATH:$ANDROID_HOME/emulator:$ANDROID_HOME/platform-tools"
 
 # Path to point sudo to the askpass binary for password prompt vpn
 export SUDO_ASKPASS="$(brew --prefix)/bin/ssh-askpass"
@@ -127,12 +130,3 @@ alias vpn="sudo openfortivpn -c ~/.openfortivpn/config"
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-
-# The following lines have been added by Docker Desktop to enable Docker CLI completions.
-fpath=(/Users/ralphmagnette/.docker/completions $fpath)
-autoload -Uz compinit
-compinit
-# End of Docker CLI completions
-
-# Starship prompt
-eval "$(starship init zsh)"
