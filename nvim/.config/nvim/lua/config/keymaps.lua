@@ -43,24 +43,3 @@ keymap("t", "<C-h>", "<Cmd>wincmd h<CR>", { desc = "Terminal left" })
 keymap("t", "<C-j>", "<Cmd>wincmd j<CR>", { desc = "Terminal down" })
 keymap("t", "<C-k>", "<Cmd>wincmd k<CR>", { desc = "Terminal up" })
 keymap("t", "<C-l>", "<Cmd>wincmd l<CR>", { desc = "Terminal right" })
-
--- Overseer.nvim keymaps
-keymap("n", "<leader>or", "<cmd>OverseerRun<cr>", { desc = "Run task" })
-keymap("n", "<leader>os", "<cmd>OverseerQuickAction<cr>", { desc = "Stop task" })
-keymap("n", "<leader>ot", "<cmd>OverseerToggle<cr>", { desc = "Task list" })
-keymap("n", "<leader>oa", "<cmd>OverseerRun<cr>", { desc = "Run again" })
-
--- Error keymaps --
-vim.keymap.set("n", "]e", function()
-  vim.diagnostic.jump({ count = 1, float = true })
-end, { desc = "Next diagnostic" })
-vim.keymap.set("n", "[e", function()
-  vim.diagnostic.jump({ count = -1, float = true })
-end, { desc = "Prev diagnostic" })
-keymap("n", "<leader>fd", require("telescope.builtin").diagnostics, {
-  desc = "Find diagnostics",
-})
-
--- Git workflow keymaps --
-keymap("n", "<leader>gd", "<cmd>DiffviewOpen<cr>", { desc = "Git diff view" })
-keymap("n", "<leader>gh", "<cmd>DiffviewFileHistory<cr>", { desc = "File history" })
