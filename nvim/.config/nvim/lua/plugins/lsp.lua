@@ -19,7 +19,7 @@ return {
               completeFunctionCalls = true,
             },
           },
-          on_attach = function(client, bufnr)
+          on_attach = function(client)
             -- Optional: disable formatting if using prettier
             client.server_capabilities.documentFormattingProvider = false
           end,

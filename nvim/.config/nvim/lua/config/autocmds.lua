@@ -13,3 +13,16 @@ vim.api.nvim_create_autocmd({ "InsertLeave", "CursorHold" }, {
   pattern = "*",
   command = "silent! write",
 })
+
+vim.api.nvim_create_autocmd("BufWritePre", {
+  pattern = { "*.ts", "*.tsx", "*.js", "*.jsx" },
+  callback = function()
+    vim.lsp.buf.code_action({
+      context = {
+        diagnostics = {},
+        only = { "source.organizeImports" },
+      },
+      apply = true,
+    })
+  end,
+})
