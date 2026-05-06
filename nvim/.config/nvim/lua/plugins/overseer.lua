@@ -1,13 +1,9 @@
 return {
   "stevearc/overseer.nvim",
-  cmd = {
-    "OverseerRun",
-    "OverseerToggle",
-    "OverseerInfo",
-    "OverseerBuild",
-  },
+  event = "VeryLazy",
   opts = {
     strategy = "toggleterm", -- nice floating terminal
+    templates = { "builtin", "npm", "yarn" },
   },
   keys = {
     { "<leader>or", "<cmd>OverseerRun<cr>", desc = "Run task" },
