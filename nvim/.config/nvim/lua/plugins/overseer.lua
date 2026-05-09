@@ -2,7 +2,7 @@ return {
   "stevearc/overseer.nvim",
   event = "VeryLazy",
   opts = {
-    strategy = "toggleterm", -- nice floating terminal
+    strategy = "toggleterm",
     templates = { "builtin", "npm", "yarn" },
   },
   keys = {

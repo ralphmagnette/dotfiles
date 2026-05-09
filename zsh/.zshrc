@@ -17,16 +17,15 @@ export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
 # Path to your Oh My Zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
 
-# Path to your Java installation.
-export JAVA_HOME=$(/usr/libexec/java_home)
-export PATH="$JAVA_HOME/bin:$PATH"
-
 # Path to your Android installation.
 export ANDROID_HOME="$HOME/Library/Android/sdk"
 export PATH="$PATH:$ANDROID_HOME/emulator:$ANDROID_HOME/platform-tools"
 
 # Path to point sudo to the askpass binary for password prompt vpn
 export SUDO_ASKPASS="$(brew --prefix)/bin/ssh-askpass"
+
+# Activate mise automatically when starting zsh
+eval "$(mise activate zsh)"
 
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time Oh My Zsh is loaded, in which case,

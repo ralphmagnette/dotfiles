@@ -34,6 +34,9 @@ palette = 13=#f5c2e7
 palette = 14=#94e2d5
 palette = 15=#a6e3a1
 
+# --- Keybindings ---
+keybind = shift+enter=text:\u000a
+
 # --- UX ---
 copy-on-select = true
 scrollback-limit = 10000
