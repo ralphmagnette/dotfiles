@@ -24,6 +24,7 @@ return {
             client.server_capabilities.documentFormattingProvider = false
           end,
         },
+        phpactor = { enabled = false },
       },
     },
   },
