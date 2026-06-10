@@ -81,3 +81,6 @@ vim.g.lazygit_floating_window_border_chars = { "╭", "╮", "╰", "╯" }
 
 -- Enable proper terminal colors (important for LazyGit UI)
 vim.opt.termguicolors = true
+
+-- Use Intelephense for PHP/Laravel language intelligence and navigation
+vim.g.lazyvim_php_lsp = "intelephense"
