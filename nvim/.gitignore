@@ -9,10 +9,7 @@
 Session.vim
 .netrwhist
 
-# Lazy.nvim
-lazy-lock.json
-
-# LazyVim state
+# LazyVim state (extras live in lua/config/lazy.lua; this file is only local bookkeeping)
 lazyvim.json
 
 # Repro / debug

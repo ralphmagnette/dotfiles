@@ -1,6 +1,5 @@
 tap "anomalyco/tap"
 tap "theseal/ssh-askpass"
-brew "asdf"
 brew "bat"
 brew "cocoapods"
 brew "eza"

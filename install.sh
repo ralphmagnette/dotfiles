@@ -116,6 +116,41 @@ else
 fi
 
 # --------------------------------------
+# 5b. Install zsh framework + theme + plugins
+#
+# zsh/.zshrc sources oh-my-zsh and loads powerlevel10k, zsh-autosuggestions and
+# zsh-syntax-highlighting. None of them are brew packages, so without this step the
+# stowed .zshrc fails on first login.
+# --------------------------------------
+if [ ! -d "$HOME/.oh-my-zsh" ]; then
+  echo "🐚 Installing oh-my-zsh..."
+  # KEEP_ZSHRC stops the installer replacing a .zshrc that stow is about to own.
+  RUNZSH=no CHSH=no KEEP_ZSHRC=yes \
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+else
+  echo "✅ oh-my-zsh already installed"
+fi
+
+ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
+
+clone_if_missing() {
+  local repo="$1" dest="$2" name="$3"
+  if [ -d "$dest" ]; then
+    echo "✅ $name already installed"
+  else
+    echo "🎨 Installing $name..."
+    git clone --depth=1 "$repo" "$dest"
+  fi
+}
+
+clone_if_missing https://github.com/romkatv/powerlevel10k.git \
+  "$ZSH_CUSTOM/themes/powerlevel10k" "powerlevel10k"
+clone_if_missing https://github.com/zsh-users/zsh-autosuggestions.git \
+  "$ZSH_CUSTOM/plugins/zsh-autosuggestions" "zsh-autosuggestions"
+clone_if_missing https://github.com/zsh-users/zsh-syntax-highlighting.git \
+  "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting" "zsh-syntax-highlighting"
+
+# --------------------------------------
 # 6. Backup existing configs (safe Stow)
 # --------------------------------------
 backup_dir="$HOME/.dotfiles-backup-$(date +%s)"
@@ -129,7 +164,7 @@ for file in .zshrc .zprofile; do
   fi
 done
 
-for dir in nvim tmux ghostty starship; do
+for dir in nvim tmux ghostty; do
   if [ -d "$HOME/.config/$dir" ] && [ ! -L "$HOME/.config/$dir" ]; then
     mv "$HOME/.config/$dir" "$backup_dir/"
   fi
@@ -140,9 +175,16 @@ done
 # --------------------------------------
 echo "🔗 Creating symlinks with Stow..."
 
-packages=(nvim tmux ghostty starship zsh)
+packages=(nvim tmux ghostty zsh)
 
 for pkg in "${packages[@]}"; do
+  # A name that no longer has a directory used to abort the whole run before the
+  # remaining packages were linked. Warn and carry on instead.
+  if [ ! -d "$pkg" ]; then
+    echo "   ⚠️ Skipping $pkg — no such directory in dotfiles"
+    continue
+  fi
+
   echo "   → Linking $pkg..."
 
   if stow -t ~ "$pkg"; then

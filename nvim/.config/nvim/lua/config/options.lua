@@ -9,8 +9,11 @@ opt.relativenumber = false
 opt.mouse = "a"
 opt.clipboard = "unnamedplus"
 opt.swapfile = false
-opt.updatetime = 200
 opt.timeoutlen = 300
+
+-- Drives CursorHold, which is what triggers the idle autosave and checktime in
+-- config/autocmds.lua. Keep it here so there is one owner for the value.
+opt.updatetime = 1000
 
 -- Indentation
 opt.expandtab = true
@@ -41,46 +44,9 @@ opt.completeopt = { "menu", "menuone", "noselect" }
 opt.shortmess:append("c")
 
 -- Fold
-opt.foldmethod = "expr"
-opt.foldexpr = "nvim_treesitter#foldexpr()"
 opt.foldlevel = 99
 opt.foldlevelstart = 99
 
--- Quickfix
-opt.hidden = true
-
--- Configure how diagnostics (errors, warnings) are displayed
-vim.diagnostic.config({
-  virtual_text = {
-    spacing = 2,
-    prefix = "●",
-  },
-  float = {
-    border = "rounded",
-  },
-  severity_sort = true,
-})
-
--- Show diagnostic popup when cursor is idle on a line
-vim.api.nvim_create_autocmd("CursorHold", {
-  callback = function()
-    vim.diagnostic.open_float(nil, {
-      focus = false,
-      border = "rounded",
-    })
-  end,
-})
-
--- Faster CursorHold trigger for quicker popup
-vim.o.updatetime = 250
-
--- LazyGit UI tweaks
-vim.g.lazygit_floating_window_winblend = 0
-vim.g.lazygit_floating_window_scaling_factor = 0.9
-vim.g.lazygit_floating_window_border_chars = { "╭", "╮", "╰", "╯" }
-
--- Enable proper terminal colors (important for LazyGit UI)
-vim.opt.termguicolors = true
-
--- Use Intelephense for PHP/Laravel language intelligence and navigation
+-- Use Intelephense for PHP rather than the extra's phpactor default. The extra reads this
+-- at module load, so it has to be set here (before lazy) rather than on a plugin spec.
 vim.g.lazyvim_php_lsp = "intelephense"
