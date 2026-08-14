@@ -180,11 +180,16 @@ end
 --- Resolved from cwd rather than a buffer, because tsserver plugins are configured once
 --- for the whole session. Walks up to the workspace root so launching nvim inside a
 --- subdirectory still finds the install.
----@return string?
+---
+--- Returns a reason alongside the nil so the caller can surface it: every failure here
+--- used to be silent, which left tsserver on the extra's default location -- a different
+--- Angular version -- with nothing to indicate the redirect never ran.
+---@return string? location, string? reason
 function M.tsserver_plugin_location()
-  local root = fs.root(uv.cwd() or ".", { "angular.json", "nx.json" })
+  local cwd = uv.cwd() or "."
+  local root = fs.root(cwd, { "angular.json", "nx.json" })
   if not root then
-    return nil
+    return nil, "no angular.json/nx.json above " .. cwd
   end
   if uv.fs_stat(server_bin(root)) then
     return package_dir(root)
@@ -192,10 +197,15 @@ function M.tsserver_plugin_location()
 
   local version = workspace_version(root)
   if not version then
-    return nil
+    return nil, "no @angular/language-service or @angular/core in " .. root
   end
   local dir = fs.joinpath(server_cache, version)
-  return uv.fs_stat(server_bin(dir)) and package_dir(dir) or nil
+  if not uv.fs_stat(server_bin(dir)) then
+    -- The cache is filled lazily by root_dir when the first Angular buffer attaches, so a
+    -- cold start on a version never opened before legitimately loses this race.
+    return nil, ("no server install for Angular %s yet (%s)"):format(version, dir)
+  end
+  return package_dir(dir)
 end
 
 ---@param bufnr integer
@@ -224,7 +234,7 @@ function M.cmd(dispatchers, config)
   end
 
   local ts_probe, ng_probe = probe_locations(root, dir)
-  return vim.lsp.rpc.start({
+  local args = {
     "node",
     server_bin(dir),
     "--stdio",
@@ -234,7 +244,22 @@ function M.cmd(dispatchers, config)
     ng_probe,
     "--angularCoreVersion",
     workspace_version(root) or "",
-  }, dispatchers)
+  }
+
+  -- The server keeps its own log, which is the only place project/tsconfig resolution is
+  -- explained; nothing about it reaches :LspLog. Opt in per-session with
+  -- ANGULARLS_LOG_FILE=/tmp/ng.log nvim -- off by default so normal use writes nothing.
+  local log_file = vim.env.ANGULARLS_LOG_FILE
+  if log_file and log_file ~= "" then
+    vim.list_extend(args, {
+      "--logFile",
+      log_file,
+      "--logVerbosity",
+      vim.env.ANGULARLS_LOG_VERBOSITY or "verbose",
+    })
+  end
+
+  return vim.lsp.rpc.start(args, dispatchers)
 end
 
 function M.on_attach(client, bufnr)

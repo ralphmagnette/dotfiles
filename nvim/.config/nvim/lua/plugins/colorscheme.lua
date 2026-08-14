@@ -14,7 +14,7 @@ return {
         gitsigns = true,
         nvimtree = true,
         treesitter = true,
-        telescope = true,
+        snacks = true,
         notify = true,
         mini = true,
       },
