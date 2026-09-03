@@ -125,7 +125,30 @@ source $ZSH/oh-my-zsh.sh
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
-alias vpn="sudo openfortivpn -c ~/.openfortivpn/config"
+# Drop any pre-existing `vpn` alias first: zsh expands aliases while parsing
+# the function definition below, which fails with a parse error on re-source.
+unalias vpn 2>/dev/null
+
+vpn() {
+	local cfg=~/.openfortivpn/config
+	local host=$(sed -n 's/^host *= *//p' $cfg)
+	local port=$(sed -n 's/^port *= *//p' $cfg)
+
+	# Wait for openfortivpn to bind its SAML callback server before opening the
+	# IdP URL: the gateway redirects to 127.0.0.1:8020 at the end of login, so
+	# opening early risks the redirect landing on a closed port.
+	(
+		for _ in {1..120}; do
+			if netstat -an -p tcp 2>/dev/null | command grep -qE '\.8020[[:space:]].*LISTEN'; then
+				open "https://${host}:${port}/remote/saml/start?redirect=1"
+				return
+			fi
+			sleep 0.25
+		done
+	) &!
+
+	sudo openfortivpn -c $cfg --saml-login
+}
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
