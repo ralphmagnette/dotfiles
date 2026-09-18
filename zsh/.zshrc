@@ -134,12 +134,28 @@ vpn() {
 	local host=$(sed -n 's/^host *= *//p' $cfg)
 	local port=$(sed -n 's/^port *= *//p' $cfg)
 
-	# Wait for openfortivpn to bind its SAML callback server before opening the
-	# IdP URL: the gateway redirects to 127.0.0.1:8020 at the end of login, so
-	# opening early risks the redirect landing on a closed port.
+	# Wait for openfortivpn to come up before opening the IdP URL: the gateway
+	# redirects to 127.0.0.1:8020 at the end of login, so opening early risks
+	# the redirect landing on a closed port.
+	#
+	# Watch for the process rather than the port: netstat no longer lists TCP
+	# sockets on recent macOS, lsof can't see a root-owned listener from an
+	# unprivileged shell, and a connect probe makes openfortivpn log
+	# "Bad request" for the empty connection.
+	#
+	# Match on the process name (-x), not the command line: `sudo openfortivpn
+	# ... --saml-login` carries that text in its own argv, so a -f pattern
+	# matches while sudo is still prompting for the password and openfortivpn
+	# has not started. The grace period covers the gap between exec and bind.
+	# The wait is bounded generously (10 min) rather than tightly, because the
+	# clock starts at the sudo password prompt, not at openfortivpn's launch.
+	# Bail out early if this shell goes away, so a disowned loop can't outlive
+	# the terminal.
 	(
-		for _ in {1..120}; do
-			if netstat -an -p tcp 2>/dev/null | command grep -qE '\.8020[[:space:]].*LISTEN'; then
+		for _ in {1..2400}; do
+			kill -0 $$ 2>/dev/null || exit
+			if pgrep -x openfortivpn >/dev/null 2>&1; then
+				sleep 0.5
 				open "https://${host}:${port}/remote/saml/start?redirect=1"
 				return
 			fi
@@ -152,3 +168,11 @@ vpn() {
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+# pnpm
+export PNPM_HOME="/Users/ralphmagnette/Library/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME/bin:"*) ;;
+  *) export PATH="$PNPM_HOME/bin:$PATH" ;;
+esac
+# pnpm end
