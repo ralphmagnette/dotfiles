@@ -1,0 +1,9 @@
+2026-09-24T07:51:42.380420Z  INFO herdr::logging: herdr starting event="app.startup" subsystem="client" outcome="started" pid=89864
+2026-09-24T07:51:42.380457Z  INFO herdr::client: connecting to server path=/Users/ralphmagnette/.config/herdr/herdr-client.sock
+2026-09-24T07:51:42.556508Z  INFO herdr::client::handshake: endpoint handshake succeeded generation=1 server_version=0.9.1
+2026-09-24T07:54:35.864230Z  WARN herdr::raw_input: flushing lone escape after input timeout; if this follows an alt chord or focus switch it may reach the pane as plain esc bytes=[27]
+2026-09-24T07:54:35.864271Z  WARN herdr::raw_input: flushing lone escape after input timeout; if this follows an alt chord or focus switch it may reach the pane as plain esc bytes=[27]
+2026-09-24T07:54:36.835616Z  INFO herdr::logging: herdr exiting event="app.shutdown" subsystem="client" outcome="completed" pid=89864
+2026-09-24T07:54:43.881284Z  INFO herdr::logging: herdr starting event="app.startup" subsystem="client" outcome="started" pid=90781
+2026-09-24T07:54:43.881315Z  INFO herdr::client: connecting to server path=/Users/ralphmagnette/.config/herdr/herdr-client.sock
+2026-09-24T07:54:43.889197Z  INFO herdr::client::handshake: endpoint handshake succeeded generation=1 server_version=0.9.1

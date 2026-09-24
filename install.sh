@@ -164,7 +164,7 @@ for file in .zshrc .zprofile; do
   fi
 done
 
-for dir in nvim tmux ghostty; do
+for dir in nvim tmux herdr ghostty; do
   if [ -d "$HOME/.config/$dir" ] && [ ! -L "$HOME/.config/$dir" ]; then
     mv "$HOME/.config/$dir" "$backup_dir/"
   fi
@@ -175,7 +175,7 @@ done
 # --------------------------------------
 echo "🔗 Creating symlinks with Stow..."
 
-packages=(nvim tmux ghostty zsh)
+packages=(nvim tmux herdr ghostty zsh)
 
 for pkg in "${packages[@]}"; do
   # A name that no longer has a directory used to abort the whole run before the
