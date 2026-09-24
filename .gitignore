@@ -1,2 +1,6 @@
 .DS_Store
 **/.DS_Store
+
+# herdr runtime state
+herdr/.config/herdr/*
+!herdr/.config/herdr/config.toml
