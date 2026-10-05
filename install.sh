@@ -165,8 +165,18 @@ for file in .zshrc .zprofile; do
 done
 
 for dir in nvim herdr ghostty; do
-  if [ -d "$HOME/.config/$dir" ] && [ ! -L "$HOME/.config/$dir" ]; then
-    mv "$HOME/.config/$dir" "$backup_dir/"
+  target="$HOME/.config/$dir"
+  if [ -d "$target" ] && [ ! -L "$target" ]; then
+    # A real herdr dir whose config already points into the dotfiles holds live
+    # runtime state (sockets, sessions). Keep it; drop only the link so stow can
+    # recreate it as one it owns (stow rejects hand-made absolute links).
+    if [ "$dir" = herdr ] && [ -L "$target/config.toml" ] &&
+      [[ "$(readlink "$target/config.toml")" == *dotfiles/herdr/* ]]; then
+      rm "$target/config.toml"
+      echo "   ℹ️ Keeping ~/.config/herdr (config already from dotfiles)"
+      continue
+    fi
+    mv "$target" "$backup_dir/"
   fi
 done
 
@@ -197,6 +207,41 @@ for pkg in "${packages[@]}"; do
 done
 
 echo "🎉 All symlinks created successfully!"
+
+# --------------------------------------
+# 7b. Neovim plugins + herdr plugins/integrations
+#
+# vim-herdr-navigation has two halves: herdr is linked to the checkout lazy.nvim
+# manages, so :Lazy update keeps both in sync. Restoring from lazy-lock.json puts
+# every machine on the same plugin commits.
+# --------------------------------------
+echo "🧩 Restoring Neovim plugins from lazy-lock.json..."
+if nvim --headless "+Lazy! restore" +qa; then
+  echo "   ✅ Neovim plugins restored"
+else
+  echo "   ⚠️ Neovim plugin restore failed — run :Lazy restore inside nvim"
+fi
+
+herdr_nav_dir="$HOME/.local/share/nvim/lazy/vim-herdr-navigation"
+
+if [ -d "$herdr_nav_dir" ] && herdr plugin link "$herdr_nav_dir" >/dev/null; then
+  echo "   ✅ Linked herdr plugin vim-herdr-navigation"
+else
+  echo "   ⚠️ Could not link vim-herdr-navigation"
+  echo "   💡 Run: herdr plugin link $herdr_nav_dir"
+fi
+
+# Shows Claude's working/idle status and icons in the herdr sidebar.
+if command -v claude >/dev/null 2>&1; then
+  if herdr integration install claude >/dev/null; then
+    echo "   ✅ herdr Claude integration installed"
+  else
+    echo "   ⚠️ Could not install the herdr Claude integration"
+    echo "   💡 Run: herdr integration install claude"
+  fi
+else
+  echo "   ℹ️ Claude Code not installed — skipping herdr Claude integration"
+fi
 
 # --------------------------------------
 # 8. Final message
