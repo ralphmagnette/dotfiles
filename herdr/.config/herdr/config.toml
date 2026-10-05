@@ -1,5 +1,5 @@
 # ~/.config/herdr/config.toml
-# Keybindings mirror tmux/.config/tmux/tmux.conf. Full reference: herdr --default-config
+# Keybindings follow tmux conventions (prefix ctrl+a). Full reference: herdr --default-config
 
 onboarding = false
 
@@ -35,26 +35,83 @@ resize_pane_up = "prefix+shift+k"
 resize_pane_right = "prefix+shift+l"
 resize_mode = "prefix+m"
 
-# New window -> new tab
-new_tab = "prefix+c"
-next_tab = "prefix+n"
-previous_tab = "prefix+p"
-switch_tab = "prefix+1..9"
+# Lowercase = workspace, uppercase = tab (workspaces/agents are used more than tabs)
 
-# Kill pane/window
-close_pane = "prefix+x"
+# Workspaces
+new_workspace = "prefix+c"
+close_workspace = "prefix+q"
+next_workspace = "prefix+n"
+previous_workspace = "prefix+p"
+switch_workspace = "prefix+1..9"
+rename_workspace = "prefix+comma"
+workspace_picker = "prefix+w"
+new_worktree = "prefix+t"
+
+# Tabs (no indexed switching: shift+digit arrives as a symbol in the terminal)
+new_tab = "prefix+shift+c"
 close_tab = ["prefix+shift+x", "prefix+ampersand"]
+next_tab = "prefix+shift+n"
+previous_tab = "prefix+shift+p"
+rename_tab = "prefix+shift+t"
 
+# Agents in the sidebar
+next_agent = "prefix+tab"
+previous_agent = "prefix+shift+tab"
+open_notification_target = "prefix+a"
+
+# Panes (an agent is a pane, so prefix+x also closes an agent)
+close_pane = "prefix+x"
+cycle_pane_next = ["prefix+o", "prefix+0"]
+cycle_pane_previous = "prefix+shift+o"
+last_pane = "prefix+semicolon"
+rename_pane = "prefix+period"
 zoom = "prefix+z"
 
-# tmux defaults: o / 0 = next pane, ; = last pane, , = rename window, $ = rename session
-cycle_pane_next = ["prefix+o", "prefix+0"]
-last_pane = "prefix+semicolon"
-rename_tab = "prefix+comma"
-rename_workspace = "prefix+shift+4"
+toggle_sidebar = "prefix+b"
 detach = "prefix+d"
+
+[[keys.command]]
+key = "prefix+i"
+type = "popup"
+command = "lazygit"
+width = "90%"
+height = "90%"
+
+# Ctrl+h/j/k/l moves across Neovim splits and herdr panes (vim-herdr-navigation plugin)
+[[keys.command]]
+key = "ctrl+h"
+type = "plugin_action"
+command = "vim-herdr-navigation.left"
+description = "navigate left (vim/herdr)"
+
+[[keys.command]]
+key = "ctrl+j"
+type = "plugin_action"
+command = "vim-herdr-navigation.down"
+description = "navigate down (vim/herdr)"
+
+[[keys.command]]
+key = "ctrl+k"
+type = "plugin_action"
+command = "vim-herdr-navigation.up"
+description = "navigate up (vim/herdr)"
+
+[[keys.command]]
+key = "ctrl+l"
+type = "plugin_action"
+command = "vim-herdr-navigation.right"
+description = "navigate right (vim/herdr)"
+
+# New agent in a temporary pane; it closes when claude exits
+[[keys.command]]
+key = "prefix+shift+a"
+type = "pane"
+command = "claude"
 
 [ui]
 accent = "#89b4fa"
 # tmux creates windows immediately without asking for a name
 prompt_new_tab_name = false
+prompt_new_workspace_name = true
+agent_panel_sort = "priority"
+status_indicators = "symbols"
