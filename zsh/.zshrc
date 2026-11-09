@@ -163,6 +163,9 @@ vpn() {
 		done
 	) &!
 
+	# No `persistent` in the config: reconnecting needs a fresh SAML login in
+	# the browser, so automatic retries only fail and hold port 8020. When the
+	# tunnel drops, openfortivpn exits; run `vpn` again.
 	sudo openfortivpn -c $cfg --saml-login
 }
 

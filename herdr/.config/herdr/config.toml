@@ -115,3 +115,9 @@ prompt_new_tab_name = false
 prompt_new_workspace_name = true
 agent_panel_sort = "priority"
 status_indicators = "symbols"
+
+[ui.toast]
+delivery = "herdr"
+
+[ui.sound]
+enabled = true
